@@ -1,4 +1,5 @@
 import java.util.*;
+import java.util.Random; //@Laurine: adding this one here, without it I kept getting compilation error 'Can not find symbol' at 'int ranNum = myRandom.nextInt(40)+1;'
 
 public class GroupLottery{
 
