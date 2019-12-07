@@ -1,95 +1,92 @@
-import java.util.*;
+import java.util.Random;
 
 public class GroupLottery{
 
-	private int[] lottery;
+	private int[] lottery; //array of lottery numbers
 
-	private int[][] userNumbers;
+	private int[][] userNumbers; //array of user numbers
 
-	private int[] matches;
-	private double winnings;
-	private double lineWinnings;
-	private int linesWon;
+	private int[] matches; //array of matches per line, array is as long as the number of rows in the array of the user numbers (e.g. if user chose 3 lines, array of matches will be [0,0,0], 2 lines [0,0]...
+
+	private int lineWinnings; //create and initialise a variable to temporarily calculate the winnings per line in one game
+
+	private int linesWon; //sum of lines won for one game
+
+	private int winnings; //sum of winnings for one game
+
+	private int totalWinnings; //sum of all the games winnings
+
+	private double aveWinnings; //average of all the winnings for all the games
+
+	private int numberOfGames; //number of games the user played
+
+	private int lotteryWon; // number of times the lottery is won in a game (as the user can only win the lottery once)
 
 
-	private final double MATCH3 = 100;
-	private final double MATCH4 = 300;
-	private final double MATCH5 = 1500;
-	private final double MATCH6 = 1000000;//@alexia==> adding here the const of six matches for an amount of money won for the entire lottery
-	private final String MATCH_6 = "You won the lottery! Stop now.";
+	private final int MATCH3 = 100; //sum won for 3 matches
+	private final int MATCH4 = 300; //sum won for 4 matches
+	private final int MATCH5 = 1500; //sum won for 5 matches
+	private final int MATCH6 = 1000000; //sum won for 6 matches - entire lottery! :-)
 
 
+	public GroupLottery(){ //generate the array of lottery (random) numbers
+		lottery = new int[6]; //initialize a new array of six values
+		for(int i=0; i<6; i=i+1){ //loop through the array
+			Random myRandom = new Random(); //declare a local variable of type Random create an object of type Random
+			int ranNum = myRandom.nextInt(40)+1; // generate one random number and specify the range in which the random numbers will be picked and store a first number within the range inside the variable ranNum
 
-	public GroupLottery(){
-		lottery = new int[6];
-		for(int i=0; i<=6; i++){
-			Random myRandom = new Random();
-			int ranNum = myRandom.nextInt(40)+1;
-
-			if( (ranNum == lottery[0]) || (ranNum == lottery[1]) || (ranNum == lottery[2]) || (ranNum == lottery[3]) || (ranNum == lottery[4]) || (ranNum == lottery[5]) ){
-				i= i-1;
+			if( (ranNum == lottery[0]) || (ranNum == lottery[1]) || (ranNum == lottery[2]) || (ranNum == lottery[3]) || (ranNum == lottery[4]) || (ranNum == lottery[5]) ){ //check uniqueness of the random number picked, compare variable ranNum to each of the value of the array, it will compare to 0 the first time the array is initialized
+				i= i-1; //if not unique so if the number is already in the array, index go back of one and a new random number will be picked
 				}
-			else{
-				lottery[i] = ranNum;
-				}
+			else {
+				lottery[i] = ranNum; //if unique, the ranNum value will be stored inside the lottery array
 			}
 		}
+	}
 
 
-	public void setUserNumbers(int userNumbers[][]){
+	public void setUserNumbers(int userNumbers[][]){ //take the user numbers from the app class so they can be compared to the lottery numbers
 		this.userNumbers=userNumbers;
-		}
+	}
 
-	public int[][] getUserNumbers(){
-		return userNumbers;
-		}
 
-	public int[] getLottery(){
+	public int[] getLottery(){ //get the lottery numbers back to the app class so they can be displayed to the user
 		return lottery;
-		}
-
-	public void setMatches(int matches[]){
-		this.matches = matches;
-		}
-
-	public int[] getMatches(){
-		return matches;
-		}
+	}
 
 
-	public double getWinnings(){
-		return winnings;
-		}
+	public void calculateMatches(){ //main computation here, compare the array of user numbers and the array of lottery numbers
 
+		matches = new int[userNumbers.length]; //create a new array of the length equivalent to the number of lines the user chose for the game
 
-	public void calculateMatches(){
-
-		matches = new int[userNumbers.length];
-
-		for(int i=0; i<=userNumbers.length; i++){
-			int match = 0;
-			for(int j= 0; j<=lottery.length; j++){
-				if(userNumbers[i][j] == lottery[j]){
-					match++;
+		for(int i=0; i<userNumbers.length; i++){ //iterate through both arrays of user numbers and lottery and compare the number
+			int match = 0; //reinitialise the match number to 0 for each line
+			for(int j=0; j<userNumbers[i].length; j++){ // iterate on columns of array of user numbers
+				for(int k= 0; k<lottery.length; k++){ // iterate on columns of array of lottery numbers
+					if(userNumbers[i][j] == lottery[k]){ //check if nums between user numbers and lottery are the same
+						match++; //add 1 to var if num are same
 					}
 				}
-			matches[i] = match;
+				matches[i] = match; // store number of matches per line, with line number being the index
 			}
 		}
+	}
 
-	public int getLinesWon(){
-		return linesWon;
-		}
 
-	public void calculateWinnings(){
-		//@alexia==> adding the method to calculate the winnings, @Laurine feel free to change anything here :-)
+	public int[] getMatches(){ //get the array of matches between user numbers and lottery, number of matches per lines
+		return matches;
+	}
 
+
+	public void calculateWinnings(){ // method to calculate winnings per game and number of lines won per game
 		winnings = 0; //initialize the sum of the winnings at 0
-		linesWon=0;
+
 		for(int i=0; i<matches.length; i++){ //loop into the array of matches (above) - each line represents one index in the array - to add to the entire sum of winnings for 1 game
+			lineWinnings = 0; // winnings per line, reinitialized for each line
 			if(matches[i] == 6){
 				lineWinnings = MATCH6; //store 1 000 000 into lineWinnings
-				linesWon +=1;
+				linesWon +=1; //add 1 to the number of lines won
+				lotteryWon++; // add 1 to the number of times the lottery is won
 			} else if(matches[i] == 5){
 				lineWinnings = MATCH5; // store 1 500 into lineWinnings
 				linesWon +=1;
@@ -102,15 +99,35 @@ public class GroupLottery{
 			}
 			winnings = winnings + lineWinnings; //add all line winnings together so these are the winnings for one game
 		}
-		//still need to discuss the below part of the method. This part allows to say that the lottery (1 million euros) is only won once per game
-		/**
-		if(winnings >= 3000000){ //however, user can only win the lottery once, so this will substract the winnings at only one time lottery win (can only win 1 million)
-			winnings = winnings - (2 * SIX_NUM); //basically says if more than 3 million, substract 2 million
-		} else if(sumWinnings >= 2000000){
-			sumWinnings = sumWinnings - SIX_NUM; //basically says if more than 2 million, substract 1 million
-		}*/
+		if(lotteryWon == 2){ // check if lottery is won more than once as the user can only win once
+			winnings = winnings - MATCH6; // if lottery won twice, deduct 1000000 to the total winnings
+		} else if(lotteryWon == 3){
+			winnings = winnings - (MATCH6*2); // if lottery won 3 times, deduct 2000000 to the total winnings
+		}
 	}
 
+
+	public int getWinnings(){ //get the user winnings for one game
+		return winnings;
+	}
+
+
+	public int getLinesWon(){ //get the number of lines won for one game
+		return linesWon;
+	}
+
+
+	public void calculateAverage(int totalWinnings, int numberOfGames){ //calculate the average of winnings of all the games
+		this.totalWinnings = totalWinnings; //taken from the App class
+		this.numberOfGames = numberOfGames; //taken from the App class
+
+		aveWinnings = (double)totalWinnings/numberOfGames; //casting here to double since it is a division
+	}
+
+
+	public double getAveWinnings(){ //get the average winnings across all games
+		return aveWinnings;
+	}
 
 
 }
